@@ -1,0 +1,252 @@
+Está tudo em uma única página <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo 3D</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+      color: #111;
+      transition: 0.3s;
+    }
+
+    .dark {
+      background: #181818;
+      color: #eee;
+    }
+
+    /* Cabeçalho */
+    .topo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .botao-icone {
+      border: none;
+      background: transparent;
+      font-size: 28px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .botao-icone:hover {
+      transform: scale(1.15);
+    }
+
+    /* Cards de produtos */
+    .produto {
+      background: #fff;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: 0.3s;
+    }
+
+    .dark .produto {
+      background: #222;
+      box-shadow: 0 4px 12px rgba(255,255,255,0.05);
+    }
+
+    .produto:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+
+    /* Carrinho lateral */
+    #carrinhoBox {
+      position: fixed;
+      top: 80px;
+      right: -350px;
+      width: 300px;
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 5px 18px rgba(0,0,0,0.2);
+      transition: 0.4s;
+      z-index: 1000;
+    }
+
+    .dark #carrinhoBox {
+      background: #222;
+    }
+
+    #carrinhoBox.ativo {
+      right: 15px;
+    }
+
+    .item-carrinho {
+      display: flex;
+      justify-content: space-between;
+      margin: 6px 0;
+    }
+
+    .item-carrinho button {
+      padding: 5px 10px;
+    }
+
+    /* Botão finalizar compra */
+    #btnFinalizar {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px;
+      width: 90%;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      background: #0088ff;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      transition: 0.3s;
+    }
+
+    #btnFinalizar:hover {
+      transform: translateX(-50%) scale(1.05);
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #aaa;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+
+    .dark input, .dark select {
+      background: #333;
+      color: #fff;
+      border-color: #555;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- TOPO -->
+  <div class="topo">
+    <h2>Catálogo 3D</h2>
+
+    <div>
+      <button class="botao-icone" onclick="toggleTema()">🌙</button>
+      <button class="botao-icone" onclick="abrirCarrinho()">🛒</button>
+    </div>
+  </div>
+
+  <!-- Carrinho lateral -->
+  <div id="carrinhoBox">
+    <h3>Carrinho</h3>
+    <ul id="carrinhoLista"></ul>
+    <button onclick="fecharCarrinho()">Fechar</button>
+  </div>
+
+  <!-- Busca -->
+  <input type="text" id="pesquisa" placeholder="Pesquisar..." oninput="filtrar()">
+
+  <select id="filtro" onchange="filtrar()">
+    <option value="todos">Todos</option>
+    <option value="suporte">Suportes</option>
+    <option value="organizador">Organizadores</option>
+  </select>
+
+  <!-- Lista Produtos -->
+  <div id="lista">
+    <div class="produto" data-categoria="suporte">
+      <h2>Suporte de Controle</h2>
+      <p>Preço: R$ 25,00</p>
+      <button onclick="adicionarCarrinho('Suporte de Controle')">Adicionar ao Carrinho</button>
+    </div>
+
+    <div class="produto" data-categoria="organizador">
+      <h2>Organizador de Cabos</h2>
+      <p>Preço: R$ 10,00</p>
+      <button onclick="adicionarCarrinho('Organizador de Cabos')">Adicionar ao Carrinho</button>
+    </div>
+  </div>
+
+  <!-- Endereço -->
+  <h3>Endereço</h3>
+  <input type="text" id="endereco" placeholder="Rua, número, bairro...">
+
+  <!-- Botão Finalizar -->
+  <button id="btnFinalizar" onclick="abrirCarrinho()">Finalizar Compra</button>
+
+  <script>
+    const numero = "5511972117278";
+    let carrinho = [];
+
+    function toggleTema() {
+      document.body.classList.toggle("dark");
+    }
+
+    function abrirCarrinho() {
+      document.getElementById("carrinhoBox").classList.add("ativo");
+    }
+
+    function fecharCarrinho() {
+      document.getElementById("carrinhoBox").classList.remove("ativo");
+    }
+
+    function adicionarCarrinho(produto) {
+      carrinho.push(produto);
+      atualizarCarrinho();
+      abrirCarrinho();
+    }
+
+    function removerItem(i) {
+      carrinho.splice(i, 1);
+      atualizarCarrinho();
+    }
+
+    function atualizarCarrinho() {
+      const lista = document.getElementById("carrinhoLista");
+      lista.innerHTML = "";
+
+      carrinho.forEach((p, i) => {
+        lista.innerHTML += `
+          <li class="item-carrinho">
+            ${p}
+            <button onclick="removerItem(${i})">X</button>
+          </li>
+        `;
+      });
+    }
+
+    function finalizarCarrinho() {
+      const end = document.getElementById("endereco").value;
+      if (!end) return alert("Informe o endereço!");
+      if (carrinho.length === 0) return alert("Carrinho vazio!");
+
+      const texto = `Pedido:%0A${carrinho.join(", ")}%0AEndereço: ${end}`;
+      window.open(`https://wa.me/${numero}?text=${texto}`);
+    }
+
+    function filtrar() {
+      const termo = pesquisa.value.toLowerCase();
+      const filtro = filtroSelect.value;
+      const produtos = document.querySelectorAll(".produto");
+
+      produtos.forEach(p => {
+        const nome = p.querySelector("h2").innerText.toLowerCase();
+        const categoria = p.getAttribute("data-categoria");
+
+        const matchTexto = nome.includes(termo);
+        const matchFiltro = filtro === "todos" || categoria === filtro;
+
+        p.style.display = matchTexto && matchFiltro ? "block" : "none";
+      });
+    }
+
+    const filtroSelect = document.getElementById("filtro");
+  </script>
+</body>
+</html>
