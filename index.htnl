@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo 3D</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body { 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: 40px 20px;
+      transition: all 0.3s ease;
+      background: #0a0a0f;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    .dark { 
+      background: #0a0a0f;
+      color: #eee;
+    }
+
+    h1 {
+      font-size: 42px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 30px;
+      text-align: center;
+      background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .controls {
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    #tema-toggle {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #8a63ff 0%, #6366f1 100%);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(138, 99, 255, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #tema-toggle::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    #tema-toggle:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(138, 99, 255, 0.6);
+    }
+
+    #tema-toggle:hover::before {
+      left: 100%;
+    }
+
+    input, select { 
+      padding: 14px 20px;
+      background: rgba(15, 15, 25, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      flex: 1;
+      min-width: 200px;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: rgba(138, 99, 255, 0.5);
+      box-shadow: 0 0 20px rgba(138, 99, 255, 0.3);
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    #lista {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 30px;
+      padding-bottom: 100px;
+    }
+
+    .produto { 
+      position: relative;
+      background: rgba(15, 15, 25, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 30px;
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      overflow: hidden;
+    }
+
+    .produto::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(120, 119, 198, 0.1), transparent 50%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .produto:hover {
+      transform: translateY(-10px) scale(1.02);
+      border-color: rgba(138, 99, 255, 0.5);
+      box-shadow: 0 30px 60px rgba(138, 99, 255, 0.3);
+    }
+
+    .produto:hover::before {
+      opacity: 1;
+    }
+
+    .produto h2 {
+      font-size: 24px;
+      background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 15px;
+    }
+
+    .produto p {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 18px;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .produto button {
+      width: 100%;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, #8a63ff 0%, #6366f1 100%);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(138, 99, 255, 0.4);
+    }
+
+    .produto button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .produto button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(138, 99, 255, 0.6);
+    }
+
+    .produto button:hover::before {
+      left: 100%;
+    }
+
+    .produto button:active {
+      transform: translateY(-1px);
+    }
+
+    #carrinhoBox { 
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: rgba(15, 15, 25, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(138, 99, 255, 0.3);
+      padding: 25px;
+      border-radius: 24px;
+      width: 320px;
+      box-shadow: 0 30px 60px rgba(138, 99, 255, 0.4);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    #carrinhoBox:hover {
+      box-shadow: 0 35px 70px rgba(138, 99, 255, 0.5);
+    }
+
+    #carrinhoBox h3 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    #carrinhoLista {
+      list-style: none;
+      margin-bottom: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    #carrinhoLista::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #carrinhoLista::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+    }
+
+    #carrinhoLista::-webkit-scrollbar-thumb {
+      background: rgba(138, 99, 255, 0.5);
+      border-radius: 3px;
+    }
+
+    .item-carrinho { 
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .item-carrinho:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(138, 99, 255, 0.3);
+    }
+
+    .item-carrinho button { 
+      width: auto;
+      padding: 8px 16px;
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      border-radius: 8px;
+      color: #ff6b6b;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .item-carrinho button:hover {
+      background: rgba(239, 68, 68, 0.3);
+      border-color: rgba(239, 68, 68, 0.6);
+      transform: scale(1.05);
+    }
+
+    #carrinhoBox > button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+    }
+
+    #carrinhoBox > button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.6);
+    }
+
+    .endereco-section {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 30px;
+      background: rgba(15, 15, 25, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+    }
+
+    .endereco-section h2 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .endereco-section input {
+      width: 100%;
+      margin: 0;
+    }
+
+    .fade { 
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      #lista {
+        grid-template-columns: 1fr;
+      }
+
+      #carrinhoBox {
+        width: calc(100% - 40px);
+        right: 20px;
+        left: 20px;
+      }
+
+      h1 {
+        font-size: 32px;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      input, select {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body class="dark">
+  <h1>Catálogo de Produtos 3D</h1>
+  
+  <div class="controls">
+    <button id="tema-toggle" onclick="toggleTema()">Alternar Tema</button>
+    <input type="text" id="pesquisa" placeholder="Pesquisar produto..." oninput="filtrar()" />
+    <select id="filtro" onchange="filtrar()">
+      <option value="todos">Todos os Produtos</option>
+      <option value="suporte">Suportes</option>
+      <option value="organizador">Organizadores</option>
+    </select>
+  </div>
+
+  <div id="lista">
+    <div class="produto" data-categoria="suporte">
+      <h2>Suporte de Controle</h2>
+      <p>Preço: R$ 25,00</p>
+      <button onclick="adicionarCarrinho('Suporte de Controle')">Adicionar ao Carrinho</button>
+    </div>
+    <div class="produto" data-categoria="organizador">
+      <h2>Organizador de Cabos</h2>
+      <p>Preço: R$ 10,00</p>
+      <button onclick="adicionarCarrinho('Organizador de Cabos')">Adicionar ao Carrinho</button>
+    </div>
+    <div class="produto" data-categoria="suporte">
+      <h2>Suporte para Celular</h2>
+      <p>Preço: R$ 18,00</p>
+      <button onclick="adicionarCarrinho('Suporte para Celular')">Adicionar ao Carrinho</button>
+    </div>
+    <div class="produto" data-categoria="organizador">
+      <h2>Organizador de Mesa</h2>
+      <p>Preço: R$ 35,00</p>
+      <button onclick="adicionarCarrinho('Organizador de Mesa')">Adicionar ao Carrinho</button>
+    </div>
+  </div>
+
+  <div class="endereco-section">
+    <h2>Informe seu endereço</h2>
+    <input type="text" id="endereco" placeholder="Rua, número, bairro, cidade..." />
+  </div>
+
+  <div id="carrinhoBox">
+    <h3>🛒 Carrinho</h3>
+    <ul id="carrinhoLista"></ul>
+    <button onclick="finalizarCarrinho()">Enviar Pedido via WhatsApp</button>
+  </div>
+
+  <script>
+    const numero = '5511972117278';
+    let carrinho = [];
+
+    function toggleTema() { 
+      document.body.classList.toggle('dark');
+    }
+
+    function adicionarCarrinho(produto) {
+      carrinho.push(produto);
+      atualizarCarrinho();
+      
+      // Feedback visual
+      const carrinhoBox = document.getElementById('carrinhoBox');
+      carrinhoBox.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        carrinhoBox.style.transform = 'scale(1)';
+      }, 200);
+    }
+
+    function removerItem(index) {
+      carrinho.splice(index, 1);
+      atualizarCarrinho();
+    }
+
+    function atualizarCarrinho() {
+      const lista = document.getElementById('carrinhoLista');
+      lista.innerHTML = '';
+      
+      if (carrinho.length === 0) {
+        lista.innerHTML = '<li style="color: rgba(255,255,255,0.5); text-align: center; padding: 20px;">Carrinho vazio</li>';
+        return;
+      }
+
+      carrinho.forEach((p, i) => {
+        const li = document.createElement('li');
+        li.className = 'item-carrinho fade';
+        li.innerHTML = `<span>${p}</span> <button onclick="removerItem(${i})">X</button>`;
+        lista.appendChild(li);
+      });
+    }
+
+    function finalizarCarrinho() {
+      const endereco = document.getElementById('endereco').value;
+      
+      if (!endereco) { 
+        alert('Por favor, preencha o endereço!');
+        document.getElementById('endereco').focus();
+        return;
+      }
+      
+      if (carrinho.length === 0) { 
+        alert('Carrinho vazio! Adicione produtos antes de finalizar.');
+        return;
+      }
+      
+      const texto = `*Novo Pedido! 🛒*%0A%0A*Produtos:*%0A${carrinho.map((p, i) => `${i + 1}. ${p}`).join('%0A')}%0A%0A*Endereço:*%0A${endereco}`;
+      window.open(`https://wa.me/${numero}?text=${texto}`, '_blank');
+    }
+
+    function filtrar() {
+      const termo = document.getElementById('pesquisa').value.toLowerCase();
+      const filtro = document.getElementById('filtro').value;
+      const produtos = document.querySelectorAll('.produto');
+      
+      produtos.forEach(p => {
+        const nome = p.querySelector('h2').innerText.toLowerCase();
+        const categoria = p.getAttribute('data-categoria');
+        const correspondeTexto = nome.includes(termo);
+        const correspondeFiltro = filtro === 'todos' || categoria === filtro;
+        p.style.display = (correspondeTexto && correspondeFiltro) ? 'block' : 'none';
+      });
+    }
+
+    // Inicializar carrinho vazio
+    atualizarCarrinho();
+  </script>
+</body>
+</html>
